@@ -4,7 +4,7 @@
 replicaCount: 1
 
 image:
-  repository: mi-api
+  repository: mi_api
   tag: "0.1.0"
   # Never: la imagen se importó con k3d image import, no viene de un registry.
   pullPolicy: Never
