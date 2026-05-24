@@ -1,0 +1,33 @@
+# Application de ArgoCD para SensorHub.
+# El chart vive en el repo de sensorhub; este manifiesto le dice a ArgoCD
+# dónde está y cómo desplegarlo. Los values-lite.yaml sobreescriben los
+# defaults para un despliegue ligero en local (minikube/kind).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sensorhub
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AmbroxMr/sensorhub.git
+    targetRevision: HEAD
+    path: helm/sensorhub
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-lite.yaml
+      values: |
+        image:
+          tag: "1.0.0"   # ← cambia esto para desplegar una versión nueva
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sensorhub
+  syncPolicy:
+    automated:
+      prune: true      # borra recursos que ya no estén en Git
+      selfHeal: true   # revierte cambios manuales en el cluster
+    syncOptions:
+      - CreateNamespace=true
